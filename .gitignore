@@ -66,5 +66,8 @@ credentials/
 # Schwab OAuth token cache
 .schwab_token.json
 
+# Personal data (watchlist etc.) — local only
+data/
+
 # pytest
 .pytest_cache/
