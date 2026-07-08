@@ -23,21 +23,27 @@
   maybe a P&L-by-account bar chart.
 
 ## Phase 2 — fundamentals research (the first "find new stocks" module)
-- ⏳ **#7** `src/research/fundamentals.py` — pull financials + valuation ratios (P/E, P/B, EV/EBITDA,
-  margins, growth) for an arbitrary ticker via `yfinance`.
-- ⏳ **#8** Dashboard: "Research" page — enter a ticker, see its fundamentals/valuation snapshot next
-  to a couple of peers.
-- ⏳ **#9** Watchlist: save tickers you're evaluating, separate from actual holdings.
+- ✅ **#7** `src/research/fundamentals.py` — 20 metrics via yfinance, live-verified. Gotcha: yfinance
+  `dividendYield` comes pre-multiplied (2.52 = 2.52%), unlike margins/growth fractions (2026-07-08).
+- ✅ **#8** Research page: ticker snapshot + peer comparison table (2026-07-08).
+- ✅ **#9** Watchlist: JSON at `data/watchlist.json` (gitignored), add/remove from Research page
+  (2026-07-08).
 
 ## Phase 3 — technicals
-- ⏳ **#10** `src/research/technicals.py` — price history, moving averages, RSI, relative strength vs.
-  a benchmark.
-- ⏳ **#11** Dashboard: chart view per ticker (holdings + watchlist).
+- ✅ **#10** `src/research/technicals.py` — SMA, Wilder RSI, relative strength vs benchmark; 7 unit
+  tests (2026-07-08).
+- ✅ **#11** Charts page: candlestick + SMA 50/200 + RSI + rel-strength-vs-SPY; picker seeded from
+  live holdings (ETFs = assetType `COLLECTIVE_INVESTMENT`) + watchlist (2026-07-08).
 
 ## Phase 4 — news & sentiment
-- ⏳ **#12** `src/research/news.py` — headline/filing feed (10-K/10-Q/8-K, analyst actions) for
-  holdings + watchlist. Needs a data-source decision (free RSS vs. a paid news API) — revisit once
-  Phases 1-3 are working and it's clear what's actually useful day-to-day.
-- ⏳ **#13** Dashboard: news feed panel.
+- ✅ **#12** `src/research/news.py` — yfinance/Yahoo news (free, no key) chosen as the v1 source;
+  swap the fetch layer if coverage proves thin. SEC-filings-specific feed NOT included (2026-07-08).
+- ✅ **#13** News page: aggregated holdings+watchlist feed, newest first (2026-07-08).
+
+## Ideas (unscheduled)
+- ⏳ **#14** SEC filings feed (10-K/10-Q/8-K via EDGAR RSS) — the filings half of the original #12.
+- ⏳ **#15** Screener: rank a universe (e.g. S&P 500) by fundamentals criteria to surface candidates.
+- ⏳ **#16** Historical portfolio value tracking (snapshot per day → performance-over-time chart).
+- ⏳ **#17** GitHub remote + review-before-push flow (money-math review gate), if/when user wants it.
 
 ✅ Completed → `../memory/completed-tasks.md`.

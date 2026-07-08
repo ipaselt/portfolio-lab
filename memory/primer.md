@@ -1,10 +1,17 @@
 # Primer — portfolio-lab
-*Rewrite each session. Last updated: 2026-07-08.*
+*Rewrite each session. Last updated: 2026-07-08 (evening).*
 
 ## State
-- **✅ Phase 0 + Phase 1 MVP WORKING (2026-07-08).** Dashboard live-verified in browser against real
-  Schwab data: 3 accounts (Individual ...XXXX, Roth IRA ...XXXX, Options ...XXXX), 10 positions,
-  correct P&L. `streamlit run src/dashboard.py`. Tests 4/4 pass.
+- **✅ ALL FOUR PHASES WORKING, live-verified (2026-07-08).** 4-page Streamlit app:
+  **dashboard** (accounts, per-account performance, positions, allocation) · **Research**
+  (fundamentals snapshot, peer compare, watchlist) · **Charts** (candlestick + SMA 50/200 + RSI +
+  rel-strength vs SPY, picker seeded from live holdings + watchlist) · **News** (aggregated Yahoo
+  feed). 3 accounts (Individual ...XXXX, Roth IRA ...XXXX, Options ...XXXX), 10 positions. Tests
+  25/25. 6 local commits, no remote.
+- **yfinance gotchas (verified live, don't relearn):** `dividendYield` is pre-multiplied
+  (2.52 = 2.52%) while margins/growth are fractions; news items nest under `content` with
+  `canonicalUrl.url`; Schwab ETFs are assetType `COLLECTIVE_INVESTMENT`, not EQUITY. Streamlit
+  renders `$…$` as LaTeX — escape dollars in any rendered feed text.
 - **Roth IRA question ANSWERED:** the Trader API DOES expose the Roth IRA — the user just had to
   check ALL accounts on the Schwab OAuth consent screen (that screen, not the app registration, is
   what scopes account visibility). Re-run `python -m src.authenticate` weekly (~7-day refresh token,

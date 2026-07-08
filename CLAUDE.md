@@ -38,9 +38,9 @@ portfolio-lab/                   — THE git repo (this folder = the main-branch
   self-contained (no cross-project imports), per the dev-root convention.
 
 ## Current State
-- Phase 1 MVP working, live-verified (2026-07-08): dashboard shows all 3 accounts (Roth IRA,
-  Individual, Options — labeled via `ACCOUNT_LABELS` in `.env`) with positions, P&L, allocation.
-- Next: `planning/todo.md` #6 → Phase 2 (fundamentals research). Detail in `memory/primer.md`.
+- All 4 phases live-verified (2026-07-08): 4-page Streamlit app — portfolio dashboard, Research
+  (fundamentals + watchlist), Charts (technicals), News. 25 tests passing, 6 local commits.
+- Next: ideas backlog in `planning/todo.md` (#14-#17). Detail in `memory/primer.md`.
 
 ## Avoid
 - Never place, modify, or cancel orders — this project is **read-only** against Schwab (positions,
