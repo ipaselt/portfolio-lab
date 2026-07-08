@@ -6,7 +6,7 @@ Position field names (`instrument.symbol`, `longQuantity`, `averagePrice`, `mark
 import pandas as pd
 import plotly.graph_objects as go
 
-from src.ui import BLUE, GREEN, MUTED, RED
+from src.ui import GREEN, MUTED, PRIMARY, RED
 
 
 def _flatten_position(account, position):
@@ -85,7 +85,7 @@ def allocation_by_symbol(df):
     pct = by_symbol["market_value"] / total * 100 if total else by_symbol["market_value"] * 0
     fig = go.Figure(go.Bar(
         x=by_symbol["market_value"], y=by_symbol["symbol"], orientation="h",
-        marker=dict(color=BLUE), text=[f"{p:.1f}%" for p in pct],
+        marker=dict(color=PRIMARY), text=[f"{p:.1f}%" for p in pct],
         textposition="outside", textfont=dict(size=11, color=MUTED),
         hovertemplate="%{y}: $%{x:,.0f}<extra></extra>",
     ))

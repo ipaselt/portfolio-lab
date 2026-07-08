@@ -4,7 +4,16 @@ import streamlit as st
 from plotly.subplots import make_subplots
 
 from src.research.technicals import fetch_history, relative_strength, rsi, sma
-from src.ui import AMBER, BLUE, BORDER, GREEN, MUTED, RED, VIOLET, page_header
+from src.ui import (
+    BORDER,
+    GREEN,
+    MUTED,
+    PRIMARY,
+    PRIMARY_LIGHT,
+    PRIMARY_MUTED,
+    RED,
+    page_header,
+)
 from src.watchlist import load_watchlist
 
 page_header("Charts", "Daily bars via Yahoo Finance · benchmark SPY · 15-minute cache")
@@ -67,7 +76,7 @@ chg = latest - close.iloc[-2] if len(close) > 1 else 0.0
 chg_pct = chg / close.iloc[-2] * 100 if len(close) > 1 and close.iloc[-2] else 0.0
 latest_rsi = rsi(close).iloc[-1]
 c1, c2, c3, c4 = st.columns(4)
-c1.metric("Last close", f"${latest:,.2f}", delta=f"{chg:+,.2f} ({chg_pct:+.2f}%)")
+c1.metric("Last close", f"${latest:,.2f}", delta=f"{chg_pct:+.2f}%")
 c2.metric("Period high", f"${hist['High'].max():,.2f}")
 c3.metric("Period low", f"${hist['Low'].min():,.2f}")
 c4.metric("RSI (14)", f"{latest_rsi:.0f}")
@@ -80,12 +89,12 @@ fig.add_trace(go.Candlestick(
     name=ticker, showlegend=False,
     increasing=dict(line=dict(color=GREEN, width=1), fillcolor=GREEN),
     decreasing=dict(line=dict(color=RED, width=1), fillcolor=RED)), row=1, col=1)
-for window, color in [(50, AMBER), (200, VIOLET)]:
+for window, color in [(50, PRIMARY_LIGHT), (200, PRIMARY_MUTED)]:
     if len(close) >= window:
         fig.add_trace(go.Scatter(x=hist.index, y=sma(close, window), name=f"SMA {window}",
                                  line=dict(width=1.4, color=color)), row=1, col=1)
 fig.add_trace(go.Scatter(x=hist.index, y=rsi(close), name="RSI 14",
-                         line=dict(width=1.3, color=BLUE), showlegend=False), row=2, col=1)
+                         line=dict(width=1.3, color=PRIMARY), showlegend=False), row=2, col=1)
 fig.add_hline(y=70, line_dash="dot", line_color=BORDER, line_width=1.4, row=2, col=1)
 fig.add_hline(y=30, line_dash="dot", line_color=BORDER, line_width=1.4, row=2, col=1)
 fig.update_layout(
@@ -99,7 +108,7 @@ st.plotly_chart(fig, use_container_width=True)
 if ticker != BENCHMARK:
     rs_series = relative_strength(close, bench["Close"])
     rs_fig = go.Figure(go.Scatter(x=rs_series.index, y=rs_series, name=f"{ticker} / {BENCHMARK}",
-                                  line=dict(color=BLUE, width=1.6)))
+                                  line=dict(color=PRIMARY, width=1.6)))
     rs_fig.add_hline(y=1.0, line_dash="dot", line_color=MUTED, line_width=1.2)
     rs_fig.update_layout(
         title=f"RELATIVE STRENGTH VS {BENCHMARK} · REBASED — ABOVE 1.0 = OUTPERFORMING",

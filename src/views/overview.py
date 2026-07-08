@@ -38,7 +38,7 @@ total_pl, total_value, pct = total_unrealized_pl(df)
 account_value_total = sum(a["liquidation_value"] for a in accounts)
 c1, c2, c3 = st.columns(3)
 c1.metric("Total account value", f"${account_value_total:,.2f}",
-          delta=f"{len(df)} positions · {len(accounts)} accounts", delta_color="off")
+          delta=f"{len(accounts)} accounts", delta_color="off")
 c2.metric("Invested market value", f"${total_value:,.2f}")
 c3.metric("Unrealized P&L", f"${total_pl:,.2f}", delta=signed_pct(pct))
 

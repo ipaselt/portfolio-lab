@@ -1,29 +1,33 @@
 """Shared design system: tokens, global CSS, plotly template, formatters.
 
 One place for every visual decision so all views read as a single product.
-Palette: institutional dark (deep navy surfaces, blue data, semantic green/red,
-amber reserved for highlights). Typography: Inter, tabular numerals for data.
+Styled to Linear's design language (docs/linear.DESIGN.md): near-black canvas
+(#010102), surface ladder with hairline borders, ONE chromatic accent — Linear
+lavender #5E6AD2 — used scarcely. Inter is the spec's sanctioned substitute for
+the proprietary Linear typeface. Green/red stay for P&L semantics (the spec's
+Known Gaps note: Linear's product UI itself uses a richer semantic palette).
 """
 import plotly.graph_objects as go
 import plotly.io as pio
 import streamlit as st
 
-# --- Design tokens -------------------------------------------------------------
-BG = "#0B0F17"          # app background
-SURFACE = "#111722"     # cards, tables, sidebar
-SURFACE_2 = "#161D2A"   # hover / nested surfaces
-BORDER = "#212B3B"
-TEXT = "#E8ECF3"
-MUTED = "#8A94A6"
-BLUE = "#4F8EF7"        # primary data color
-GREEN = "#22C55E"       # gains
-RED = "#EF4444"         # losses
-AMBER = "#E5A50A"       # highlight (SMA-50, callouts)
-VIOLET = "#8B5CF6"      # secondary series (SMA-200)
+# --- Design tokens (Linear: docs/linear.DESIGN.md) -------------------------------
+BG = "#010102"             # canvas — near-black with faint blue tint (never #000)
+SURFACE = "#0F1011"        # surface-1: cards, tables, sidebar
+SURFACE_2 = "#141516"      # surface-2: hover / nested / badges
+BORDER = "#23252A"         # hairline
+BORDER_STRONG = "#34343A"  # hairline-strong
+TEXT = "#F7F8F8"           # ink
+MUTED = "#8A8F98"          # ink-subtle
+PRIMARY = "#5E6AD2"        # Linear lavender — THE accent; use scarcely
+PRIMARY_LIGHT = "#828FFF"  # lavender hover — secondary series (SMA-50)
+PRIMARY_MUTED = "#7A7FAD"  # brand-secure lavender-gray — tertiary series (SMA-200)
+GREEN = "#27A644"          # semantic success (Linear's green) — gains
+RED = "#E5484D"            # losses (desaturated to sit on the dark canvas)
 
-COLORWAY = [BLUE, AMBER, VIOLET, GREEN, RED, "#38BDF8", "#F472B6", "#A3E635"]
+COLORWAY = [PRIMARY, PRIMARY_LIGHT, PRIMARY_MUTED, GREEN, RED, "#D0D6E0", "#62666D"]
 
-FONT_STACK = "'Inter', -apple-system, 'Segoe UI', sans-serif"
+FONT_STACK = "'Inter', 'SF Pro Display', -apple-system, system-ui, 'Segoe UI', sans-serif"
 
 
 def inject_css():
@@ -58,28 +62,30 @@ html, body, [class*="st-"] {{
     font-size: 0.86rem;
 }}
 
-/* Typography scale */
+/* Typography scale — Linear: display 600 with negative tracking, body 400 */
 h1 {{
-    font-size: 1.45rem !important; font-weight: 650 !important;
-    letter-spacing: -0.01em; color: {TEXT} !important;
+    font-size: 1.5rem !important; font-weight: 600 !important;
+    letter-spacing: -0.02em; color: {TEXT} !important;
     padding-bottom: 0 !important;
 }}
 h2 {{
-    font-size: 0.78rem !important; font-weight: 600 !important;
-    text-transform: uppercase; letter-spacing: 0.09em;
+    /* Linear "eyebrow": small caps label with POSITIVE tracking, hairline rule */
+    font-size: 0.74rem !important; font-weight: 500 !important;
+    text-transform: uppercase; letter-spacing: 0.06em;
     color: {MUTED} !important;
     border-bottom: 1px solid {BORDER}; padding-bottom: 0.45rem !important;
-    margin-top: 0.8rem !important;
+    margin-top: 0.9rem !important;
 }}
 h3 {{
-    font-size: 1.02rem !important; font-weight: 600 !important; color: {TEXT} !important;
+    font-size: 1.05rem !important; font-weight: 500 !important;
+    letter-spacing: -0.01em; color: {TEXT} !important;
 }}
 
-/* Metric cards */
+/* Metric cards — Linear feature-card: surface-1, hairline, 12px radius */
 [data-testid="stMetric"] {{
     background: {SURFACE};
     border: 1px solid {BORDER};
-    border-radius: 10px;
+    border-radius: 12px;
     padding: 0.9rem 1.1rem;
 }}
 [data-testid="stMetricLabel"] {{ white-space: normal !important; }}
@@ -100,41 +106,71 @@ h3 {{
     font-size: 0.8rem !important; font-variant-numeric: tabular-nums;
 }}
 
-/* Tables: tabular numerals, tighter, bordered */
+/* Tables: tabular numerals, hairline border, 12px radius */
 [data-testid="stDataFrame"] {{
-    border: 1px solid {BORDER}; border-radius: 10px; overflow: hidden;
+    border: 1px solid {BORDER}; border-radius: 12px; overflow: hidden;
 }}
 [data-testid="stDataFrame"] * {{
     font-variant-numeric: tabular-nums;
 }}
 
-/* Inputs */
+/* Inputs — Linear text-input: surface-1, 8px radius, lavender focus ring */
 [data-testid="stTextInput"] input, [data-testid="stSelectbox"] div[data-baseweb] {{
     font-size: 0.88rem;
+}}
+[data-testid="stTextInput"] > div > div, [data-testid="stSelectbox"] > div > div {{
+    background: {SURFACE} !important; border-radius: 8px;
+}}
+[data-testid="stTextInput"] > div > div:focus-within {{
+    border-color: {PRIMARY} !important;
+    box-shadow: 0 0 0 2px rgba(94, 106, 210, 0.5) !important;
+}}
+
+/* Buttons — Linear button-secondary: surface-1, hairline, 8px radius */
+[data-testid="stBaseButton-secondary"] {{
+    background: {SURFACE}; border: 1px solid {BORDER}; border-radius: 8px;
+    color: {TEXT}; font-weight: 500; font-size: 0.85rem;
+}}
+[data-testid="stBaseButton-secondary"]:hover {{
+    background: {SURFACE_2}; border-color: {BORDER_STRONG}; color: {TEXT};
+}}
+
+/* Sidebar nav: active item = surface lift; lavender reserved for the active icon */
+[data-testid="stSidebarNav"] a {{
+    border-radius: 8px;
+}}
+[data-testid="stSidebarNav"] a[aria-current="page"] {{
+    background: {SURFACE_2} !important;
+}}
+[data-testid="stSidebarNav"] a[aria-current="page"] [data-testid="stIconMaterial"] {{
+    color: {PRIMARY} !important;
 }}
 
 /* Captions and dividers */
 [data-testid="stCaptionContainer"] {{ color: {MUTED}; }}
 hr {{ border-color: {BORDER} !important; }}
 
-/* News cards */
+/* News cards — Linear feature-card, hover = surface-2 lift */
 .pl-news-card {{
-    background: {SURFACE}; border: 1px solid {BORDER}; border-radius: 10px;
+    background: {SURFACE}; border: 1px solid {BORDER}; border-radius: 12px;
     padding: 0.85rem 1.05rem; margin-bottom: 0.6rem;
+    transition: background 150ms ease, border-color 150ms ease;
 }}
+.pl-news-card:hover {{ background: {SURFACE_2}; border-color: {BORDER_STRONG}; }}
 .pl-news-card a {{
-    color: {TEXT}; font-weight: 600; font-size: 0.93rem; text-decoration: none;
-    line-height: 1.35;
+    color: {TEXT}; font-weight: 500; font-size: 0.93rem; text-decoration: none;
+    line-height: 1.35; letter-spacing: -0.005em;
 }}
-.pl-news-card a:hover {{ color: {BLUE}; }}
+.pl-news-card a:hover {{ color: {PRIMARY_LIGHT}; }}
 .pl-news-summary {{
     color: {MUTED}; font-size: 0.82rem; line-height: 1.5; margin: 0.3rem 0 0.35rem 0;
 }}
 .pl-news-meta {{ color: {MUTED}; font-size: 0.72rem; }}
 .pl-ticker-badge {{
+    /* Linear status-badge: surface-2 pill, muted ink */
     display: inline-block; background: {SURFACE_2}; border: 1px solid {BORDER};
-    color: {BLUE}; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.04em;
-    padding: 0.1rem 0.45rem; border-radius: 5px; margin-right: 0.5rem;
+    color: #D0D6E0; font-size: 0.68rem; font-weight: 500; letter-spacing: 0.04em;
+    padding: 0.1rem 0.55rem; border-radius: 9999px; margin-right: 0.5rem;
     font-variant-numeric: tabular-nums; vertical-align: 2px;
 }}
 .pl-asof {{
