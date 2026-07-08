@@ -1,19 +1,13 @@
-"""News page — headlines for holdings and watchlist tickers."""
-import os
-import sys
-from pathlib import Path
-
-PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
-os.chdir(PROJECT_ROOT)
-sys.path.insert(0, str(PROJECT_ROOT))
+"""News — headlines for holdings and watchlist tickers, card layout."""
+import html
 
 import streamlit as st
 
 from src.research.news import age_label, fetch_news
+from src.ui import page_header
 from src.watchlist import load_watchlist
 
-st.set_page_config(page_title="News — Portfolio Lab", layout="wide")
-st.title("News")
+page_header("News", "Yahoo Finance headlines · holdings + watchlist · 15-minute cache")
 
 
 @st.cache_data(ttl=900, show_spinner=False)
@@ -43,7 +37,8 @@ if not universe:
     st.info("No holdings or watchlist tickers found — add some on the Research page.")
     st.stop()
 
-scope = st.radio("Show news for", ["All holdings + watchlist", "One ticker"], horizontal=True)
+scope = st.radio("Scope", ["All holdings + watchlist", "One ticker"],
+                 horizontal=True, label_visibility="collapsed")
 
 if scope == "One ticker":
     ticker = st.selectbox("Ticker", universe)
@@ -61,22 +56,18 @@ with st.spinner("Fetching headlines…"):
         except Exception:
             continue  # one flaky ticker shouldn't sink the feed
 
-# Newest first; undated items sink to the bottom.
 all_items.sort(key=lambda i: (i["published"] is None,
                               -(i["published"].timestamp() if i["published"] else 0)))
 
 if not all_items:
     st.info("No headlines right now.")
-def _md_safe(text):
-    # Streamlit markdown renders $…$ as LaTeX — escape dollars in news text.
-    return text.replace("$", "\\$")
-
 
 for item in all_items:
-    tag = " · 🎬 video" if item["type"] == "VIDEO" else ""
-    summary = _md_safe(item["summary"][:280] + ("…" if len(item["summary"]) > 280 else ""))
-    st.markdown(
-        f"**`{item['ticker']}`  [{_md_safe(item['title'])}]({item['url']})**  \n"
-        f"{summary}  \n"
-        f"*{item['provider']} · {age_label(item['published'])}{tag}*")
-    st.divider()
+    title = html.escape(item["title"])
+    summary = html.escape(item["summary"][:260] + ("…" if len(item["summary"]) > 260 else ""))
+    video = " · Video" if item["type"] == "VIDEO" else ""
+    st.markdown(f"""<div class="pl-news-card">
+<span class="pl-ticker-badge">{item['ticker']}</span><a href="{item['url']}" target="_blank">{title}</a>
+<div class="pl-news-summary">{summary}</div>
+<div class="pl-news-meta">{html.escape(item['provider'])} · {age_label(item['published'])}{video}</div>
+</div>""", unsafe_allow_html=True)

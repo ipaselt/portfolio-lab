@@ -22,10 +22,16 @@
 - **Bug fixed during live verify:** per-position `unrealized_pl_pct` originally divided by market
   value → nonsense (-127% on a long); now divides by cost basis (= market_value − unrealized_pl),
   regression-tested.
+- **Professional redesign (2026-07-08 evening):** restructured to `src/app.py` (st.navigation entry)
+  + `src/views/{overview,research,charts,news}.py` + `src/ui.py` (design tokens, global CSS, plotly
+  template, Inter/tabular-nums, institutional dark palette). `src/dashboard.py` + `src/pages/` are
+  GONE. Gotchas: the global font CSS must not clobber `stIconMaterial` (Material icons render as
+  garbled text); metric values need the no-ellipsis override + clamp() sizing; NumberColumn
+  `format="dollar"` gives thousands separators (printf `$%.2f` does not).
 - **Preview/launch note:** the dashboard launch config lives in `~/Developer/.claude/launch.json`
-  ("portfolio-dashboard") because Preview reads the SESSION root's launch.json, not the project's;
-  `dashboard.py` chdir's to the project root at import so relative .env/token paths work from any cwd.
-  Streamlit does NOT hot-reload imported src/ modules — restart the server after editing them.
+  ("portfolio-dashboard" → `src/app.py`) because Preview reads the SESSION root's launch.json, not
+  the project's; `app.py` chdir's to the project root at import so relative .env/token paths work
+  from any cwd. Streamlit does NOT hot-reload imported src/ modules — restart after editing them.
 - **Not yet done:** no GitHub remote (local commits only, user hasn't asked to publish); global git
   identity set 2026-07-08 (ipase / ipaseltiner@gmail.com).
 

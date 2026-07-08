@@ -92,6 +92,8 @@ def test_pct_of_portfolio_column_sums_to_100():
 def test_allocation_by_symbol_groups_across_accounts():
     df = positions_dataframe(ACCOUNTS)
     fig = allocation_by_symbol(df)
-    # VTI appears in both accounts and should be summed into one slice, not two.
-    labels = list(fig.data[0].labels)
-    assert sorted(labels) == ["AAPL", "VTI"]
+    # VTI appears in both accounts and should be summed into one bar, not two.
+    symbols = list(fig.data[0].y)
+    assert sorted(symbols) == ["AAPL", "VTI"]
+    values = dict(zip(fig.data[0].y, fig.data[0].x))
+    assert values["VTI"] == 3300.0  # 2200 + 1100 across the two accounts

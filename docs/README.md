@@ -15,7 +15,7 @@ never places, modifies, or cancels orders.
    which accounts the token can see. **Check that your Roth IRA and individual account show up here**
    — if only the options account appears, the OAuth consent needs to be re-granted with the other
    accounts selected (or the Trader API may not expose IRAs at all — see `planning/todo.md` #2-#3).
-5. `streamlit run src/dashboard.py` — opens the dashboard in your browser.
+5. `streamlit run src/app.py` — opens the dashboard in your browser.
 
 The Schwab refresh token expires roughly every 7 days; re-run step 4 when the dashboard reports an
 auth error.

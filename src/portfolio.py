@@ -4,7 +4,9 @@ Position field names (`instrument.symbol`, `longQuantity`, `averagePrice`, `mark
 `longOpenProfitLoss`) verified against a live Schwab response 2026-07-08.
 """
 import pandas as pd
-import plotly.express as px
+import plotly.graph_objects as go
+
+from src.ui import BLUE, GREEN, MUTED, RED
 
 
 def _flatten_position(account, position):
@@ -59,19 +61,41 @@ def account_performance(df):
 
 
 def pl_by_account_chart(df):
-    """Bar chart of unrealized P&L per account, green/red by sign."""
+    """Bar chart of unrealized P&L per account, semantic green/red by sign."""
     perf = account_performance(df)
-    fig = px.bar(perf, x="account", y="unrealized_pl", title="Unrealized P&L by account",
-                 color=perf["unrealized_pl"] > 0,
-                 color_discrete_map={True: "#2ca02c", False: "#d62728"})
-    fig.update_layout(showlegend=False, yaxis_title="Unrealized P&L ($)", xaxis_title="")
+    colors = [GREEN if v >= 0 else RED for v in perf["unrealized_pl"]]
+    fig = go.Figure(go.Bar(
+        x=perf["account"], y=perf["unrealized_pl"], marker=dict(color=colors),
+        text=[f"{'+' if v >= 0 else '-'}${abs(v):,.0f}" for v in perf["unrealized_pl"]],
+        textposition="outside", textfont=dict(size=11, color=MUTED),
+        hovertemplate="%{x}: $%{y:,.2f}<extra></extra>",
+    ))
+    fig.update_layout(
+        title="UNREALIZED P&L BY ACCOUNT", height=300, showlegend=False, bargap=0.55,
+        yaxis=dict(title=None, tickprefix="$", tickformat=",.0f"), xaxis=dict(title=None),
+    )
     return fig
 
 
 def allocation_by_symbol(df):
-    """Return a plotly pie chart of portfolio allocation by symbol (summed across accounts)."""
-    by_symbol = df.groupby("symbol", as_index=False)["market_value"].sum()
-    return px.pie(by_symbol, names="symbol", values="market_value", title="Allocation by symbol")
+    """Horizontal bar of allocation by symbol, largest first — reads more precisely than a pie."""
+    by_symbol = (df.groupby("symbol", as_index=False)["market_value"].sum()
+                 .sort_values("market_value", ascending=True))
+    total = by_symbol["market_value"].sum()
+    pct = by_symbol["market_value"] / total * 100 if total else by_symbol["market_value"] * 0
+    fig = go.Figure(go.Bar(
+        x=by_symbol["market_value"], y=by_symbol["symbol"], orientation="h",
+        marker=dict(color=BLUE), text=[f"{p:.1f}%" for p in pct],
+        textposition="outside", textfont=dict(size=11, color=MUTED),
+        hovertemplate="%{y}: $%{x:,.0f}<extra></extra>",
+    ))
+    fig.update_layout(
+        title="ALLOCATION BY SYMBOL", height=max(260, 34 * len(by_symbol) + 90),
+        xaxis=dict(title=None, tickprefix="$", tickformat=",.0f"),
+        yaxis=dict(title=None), showlegend=False, bargap=0.35,
+        xaxis_range=[0, by_symbol["market_value"].max() * 1.18],
+    )
+    return fig
 
 
 def total_unrealized_pl(df):

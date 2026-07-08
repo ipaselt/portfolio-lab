@@ -25,9 +25,9 @@ portfolio-lab/                   — THE git repo (this folder = the main-branch
 - **Stack:** Python 3 · [`schwab-py`](https://github.com/alexgolec/schwab-py) (Schwab Trader API + OAuth, read-only)
   · `yfinance` (market data / fundamentals for research) · `pandas` · `plotly` · `streamlit` (dashboard)
 - **Routing:** Schwab client → `src/schwab_client.py` · portfolio aggregation → `src/portfolio.py` ·
-  research modules → `src/research/` (fundamentals/technicals/news, built incrementally) · dashboard →
-  `src/dashboard.py`
-- **Commands:** `streamlit run src/dashboard.py` (dashboard) · `python -m src.authenticate` (Schwab
+  research modules → `src/research/` (fundamentals/technicals/news) · app shell + nav →
+  `src/app.py` · pages → `src/views/` · design system (tokens/CSS/plotly template) → `src/ui.py`
+- **Commands:** `streamlit run src/app.py` (dashboard) · `python -m src.authenticate` (Schwab
   (re-)auth, ~weekly) · `pytest` (test) — venv at `.venv/`
 
 ## Conventions
