@@ -1,0 +1,7 @@
+schwab-py
+yfinance
+pandas
+plotly
+streamlit
+python-dotenv
+pytest
