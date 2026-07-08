@@ -24,9 +24,12 @@
   regression-tested.
 - **Professional redesign (2026-07-08 evening):** restructured to `src/app.py` (st.navigation entry)
   + `src/views/{overview,research,charts,news}.py` + `src/ui.py` (design tokens, global CSS, plotly
-  template, Inter/tabular-nums, institutional dark palette). `src/dashboard.py` + `src/pages/` are
-  GONE. Gotchas: the global font CSS must not clobber `stIconMaterial` (Material icons render as
-  garbled text); metric values need the no-ellipsis override + clamp() sizing; NumberColumn
+  template, Inter/tabular-nums). `src/dashboard.py` + `src/pages/` are GONE. Then **rethemed to
+  Linear's design language** — style contract vendored at `docs/linear.DESIGN.md`; single lavender
+  accent #5E6AD2, canvas #010102, surface ladder + hairlines; tokens are PRIMARY/PRIMARY_LIGHT/
+  PRIMARY_MUTED/GREEN/RED in `src/ui.py` (BLUE/AMBER/VIOLET no longer exist). Gotchas: the global
+  font CSS must not clobber `stIconMaterial` (Material icons render as garbled text); metric values
+  need the no-ellipsis override + clamp() sizing and SHORT delta strings; NumberColumn
   `format="dollar"` gives thousands separators (printf `$%.2f` does not).
 - **Preview/launch note:** the dashboard launch config lives in `~/Developer/.claude/launch.json`
   ("portfolio-dashboard" → `src/app.py`) because Preview reads the SESSION root's launch.json, not
