@@ -7,21 +7,20 @@
 > incrementally rather than all at once.
 
 ## Phase 0 — verify before building on top of it
-- ⏳ **#1** Copy Schwab app credentials from `../trade-log/.env` into this project's `.env`, then run
-  `python -m src.authenticate`. Confirms the OAuth flow works standalone here.
-- ⏳ **#2** Inspect what `get_accounts_summary()` actually returns. Confirm: (a) does it include the
-  Roth IRA and individual accounts, or only the options account trade-log was scoped to? (b) if IRA
-  is missing, can the Schwab OAuth consent screen be re-run to add it, or does the Trader API not
-  expose retirement accounts at all (checked against real behavior, not assumed)? (c) do the assumed
-  JSON field names in `schwab_client.py`/`portfolio.py` match reality — fix them if not.
-- ⏳ **#3** If Roth IRA truly isn't reachable via the API: decide the fallback (manual balance/holdings
-  entry for that account vs. leaving it untracked) — user decision, don't assume.
+- ✅ **#1** Credentials copied, `python -m src.authenticate` works standalone here (2026-07-08).
+- ✅ **#2** Verified live: all 3 accounts visible (the OAuth CONSENT SCREEN scopes account access —
+  user re-consented with all accounts checked). Roth IRA IS exposed by the Trader API. Field names
+  matched as assumed except: `type` is only CASH/MARGIN (→ `ACCOUNT_LABELS` in `.env`), and
+  zero-position accounts omit the `positions` key entirely.
+- ✅ **#3** Moot — Roth IRA is reachable, no fallback needed.
 
 ## Phase 1 — portfolio tracking MVP
-- ⏳ **#4** Fix `positions_dataframe()`/`get_accounts_summary()` against real field names (from #2).
-- ⏳ **#5** Dashboard: positions table + allocation-by-symbol chart + total unrealized P&L, across
-  every account the token can see, labeled by account type.
-- ⏳ **#6** Cost-basis / performance view: per-position and total unrealized gain/loss, % of portfolio.
+- ✅ **#4** Client verified against real field names; account labels wired (2026-07-08).
+- ✅ **#5** Dashboard verified live in browser: positions table + allocation chart + total P&L across
+  all 3 labeled accounts. Fixed en route: per-position P&L % now divides by cost basis, not market
+  value (regression test added).
+- ⏳ **#6** Cost-basis / performance view: per-account subtotals, % of portfolio per position,
+  maybe a P&L-by-account bar chart.
 
 ## Phase 2 — fundamentals research (the first "find new stocks" module)
 - ⏳ **#7** `src/research/fundamentals.py` — pull financials + valuation ratios (P/E, P/B, EV/EBITDA,

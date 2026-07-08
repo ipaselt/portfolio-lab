@@ -2,23 +2,25 @@
 *Rewrite each session. Last updated: 2026-07-08.*
 
 ## State
-- **Scaffolded, not yet run (2026-07-08).** Skeleton + first-cut code exist: `src/schwab_client.py`
-  (get_client + get_accounts_summary, reads ALL linked accounts — unlike trade-log's client, which
-  hardcodes `accounts[0]`), `src/authenticate.py` (copied from trade-log's proven in-process HTTPS
-  callback flow — the standard schwab-py/Flask auto-capture is broken on this Windows box, don't
-  rediscover that), `src/portfolio.py` (positions → DataFrame + allocation chart), `src/dashboard.py`
-  (Streamlit entrypoint).
-- **Unverified against live data:** the Schwab JSON field names in `schwab_client.py`/`portfolio.py`
-  (`securitiesAccount`, `positions`, `currentBalances`, etc.) are written from `schwab-py` docs/
-  trade-log's pattern, not confirmed against a real response from this project. First run will likely
-  need field-name fixes — expected, not a bug to be surprised by.
-- **Not yet answered:** does the existing Schwab app's OAuth consent (currently scoped to the options
-  account for trade-log) already cover the user's Roth IRA + individual brokerage account, or does
-  consent need to be re-granted per account? Does the Schwab Trader API expose Roth IRA data at all?
-  → `planning/todo.md` #1-#3.
-- **Not yet done:** `.env` not created (needs the user's real Schwab app key/secret, same ones as
-  `trade-log/.env` — same registered app), Python venv not created, dependencies not installed, no git
-  commits yet.
+- **✅ Phase 0 + Phase 1 MVP WORKING (2026-07-08).** Dashboard live-verified in browser against real
+  Schwab data: 3 accounts (Individual ...XXXX, Roth IRA ...XXXX, Options ...XXXX), 10 positions,
+  correct P&L. `streamlit run src/dashboard.py`. Tests 4/4 pass.
+- **Roth IRA question ANSWERED:** the Trader API DOES expose the Roth IRA — the user just had to
+  check ALL accounts on the Schwab OAuth consent screen (that screen, not the app registration, is
+  what scopes account visibility). Re-run `python -m src.authenticate` weekly (~7-day refresh token,
+  same as trade-log; must run in a real terminal, needs browser + stdin).
+- **Live-schema gotchas (don't relearn):** `securitiesAccount.type` = CASH/MARGIN only — NOTHING in
+  the API says Roth-vs-Individual, hence `ACCOUNT_LABELS` in `.env` (last4:label). Zero-position
+  accounts have NO `positions` key. Other field names matched schwab-py docs as assumed.
+- **Bug fixed during live verify:** per-position `unrealized_pl_pct` originally divided by market
+  value → nonsense (-127% on a long); now divides by cost basis (= market_value − unrealized_pl),
+  regression-tested.
+- **Preview/launch note:** the dashboard launch config lives in `~/Developer/.claude/launch.json`
+  ("portfolio-dashboard") because Preview reads the SESSION root's launch.json, not the project's;
+  `dashboard.py` chdir's to the project root at import so relative .env/token paths work from any cwd.
+  Streamlit does NOT hot-reload imported src/ modules — restart the server after editing them.
+- **Not yet done:** no GitHub remote (local commits only, user hasn't asked to publish); global git
+  identity set 2026-07-08 (ipase / ipaseltiner@gmail.com).
 
 ## Next
-Start at `planning/todo.md` #1.
+`planning/todo.md` #6 (cost-basis/performance view polish) → Phase 2 (fundamentals research module).

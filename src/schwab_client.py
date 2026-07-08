@@ -4,10 +4,10 @@ Reads positions and balances across EVERY account this token's OAuth consent cov
 trade-log's client, which only ever looks at accounts[0] (fine there — it only cares about one
 account's option trades).
 
-UNVERIFIED: the JSON shape below (`securitiesAccount`, `positions`, `currentBalances`, ...) is
-written from schwab-py's docs and trade-log's working transaction-history code, not confirmed
-against a live positions response from this project. Run `python -m src.authenticate` and inspect
-the printed summary; fix field names here if they don't match (see planning/todo.md #2).
+Field names verified against a live response 2026-07-08. Gotchas learned from real data:
+- `securitiesAccount.type` is CASH vs MARGIN, NOT the account category — nothing in the response
+  says "Roth IRA" vs "Individual". Human-readable names come from ACCOUNT_LABELS in .env.
+- An account with no positions has NO `positions` key at all (not an empty list).
 """
 import os
 
@@ -43,23 +43,34 @@ def get_client():
     return client_from_token_file(token_path, api_key, app_secret)
 
 
-def get_accounts_summary(client):
-    """Return every account this token can see: type, masked number, positions, balances.
+def _account_labels():
+    """Parse ACCOUNT_LABELS from .env: '1234:Individual,5678:Roth IRA' → {last4: label}."""
+    raw = os.environ.get("ACCOUNT_LABELS", "")
+    labels = {}
+    for pair in raw.split(","):
+        if ":" in pair:
+            last4, label = pair.split(":", 1)
+            labels[last4.strip()] = label.strip()
+    return labels
 
-    This is the verification step for planning/todo.md #2 — run it and check whether the Roth
-    IRA and individual account actually show up, not just the options account.
-    """
+
+def get_accounts_summary(client):
+    """Return every account this token can see: label, masked number, positions, balances."""
     resp = client.get_accounts(fields=[client.Account.Fields.POSITIONS])
     resp.raise_for_status()
 
+    labels = _account_labels()
     accounts = []
     for entry in resp.json():
         acct = entry["securitiesAccount"]
         account_number = acct.get("accountNumber", "")
+        last4 = account_number[-4:] if account_number else ""
         accounts.append({
-            "account_number_masked": f"...{account_number[-4:]}" if account_number else "unknown",
+            "account_number_masked": f"...{last4}" if last4 else "unknown",
+            "label": labels.get(last4, f"...{last4}" if last4 else "unknown"),
             "type": acct.get("type", "UNKNOWN"),
             "positions": acct.get("positions", []),
             "current_balances": acct.get("currentBalances", {}),
+            "liquidation_value": acct.get("currentBalances", {}).get("liquidationValue", 0.0),
         })
     return accounts

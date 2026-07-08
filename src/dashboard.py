@@ -1,7 +1,16 @@
 """Portfolio Lab dashboard — local Streamlit app. Read-only against Schwab.
 
-Run: streamlit run src/dashboard.py
+Run: streamlit run src/dashboard.py  (from any cwd — the app anchors itself to the project root
+so the relative .env / token paths resolve no matter where streamlit was launched from)
 """
+import os
+import sys
+from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+os.chdir(PROJECT_ROOT)
+sys.path.insert(0, str(PROJECT_ROOT))
+
 import streamlit as st
 
 from src.schwab_client import ReauthNeeded, get_accounts_summary, get_client
@@ -22,8 +31,9 @@ except KeyError:
 
 st.subheader("Accounts")
 for acct in accounts:
-    st.write(f"**{acct['type']}** ({acct['account_number_masked']}) — "
-             f"{len(acct['positions'])} position(s)")
+    st.write(f"**{acct['label']}** ({acct['account_number_masked']}) — "
+             f"{len(acct['positions'])} position(s) · "
+             f"account value ${acct['liquidation_value']:,.2f}")
 
 df = positions_dataframe(accounts)
 if df.empty:

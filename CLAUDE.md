@@ -38,15 +38,9 @@ portfolio-lab/                   — THE git repo (this folder = the main-branch
   self-contained (no cross-project imports), per the dev-root convention.
 
 ## Current State
-- Skeleton scaffolded, schema-uncertain first-cut code written (schwab_client.py / portfolio.py /
-  dashboard.py) — **not yet run against live data**, since account/position field names in Schwab's
-  response are assumed from `schwab-py` docs, not verified live from this session. Full backlog in
-  `planning/todo.md`. See `memory/primer.md` for the up-to-date state.
-- **Two open unknowns, first task in the queue:** (1) whether the existing Schwab OAuth consent
-  already covers the Roth IRA + individual accounts, or only the options account it was granted for;
-  (2) whether the Schwab Trader API exposes retirement (Roth IRA) account data at all — some brokers
-  restrict API access to taxable accounts. Both resolve by running `python -m src.authenticate` here
-  and inspecting what `get_accounts_summary()` returns.
+- Phase 1 MVP working, live-verified (2026-07-08): dashboard shows all 3 accounts (Roth IRA,
+  Individual, Options — labeled via `ACCOUNT_LABELS` in `.env`) with positions, P&L, allocation.
+- Next: `planning/todo.md` #6 → Phase 2 (fundamentals research). Detail in `memory/primer.md`.
 
 ## Avoid
 - Never place, modify, or cancel orders — this project is **read-only** against Schwab (positions,

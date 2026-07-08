@@ -7,7 +7,8 @@ from src.portfolio import allocation_by_symbol, positions_dataframe, total_unrea
 
 ACCOUNTS = [
     {
-        "type": "ROTH IRA",
+        "type": "CASH",
+        "label": "Roth IRA",
         "account_number_masked": "...1111",
         "positions": [
             {
@@ -21,7 +22,8 @@ ACCOUNTS = [
         "current_balances": {},
     },
     {
-        "type": "INDIVIDUAL",
+        "type": "CASH",
+        "label": "Individual",
         "account_number_masked": "...2222",
         "positions": [
             {
@@ -48,7 +50,14 @@ def test_positions_dataframe_flattens_all_accounts():
     df = positions_dataframe(ACCOUNTS)
     assert len(df) == 3
     assert set(df["symbol"]) == {"VTI", "AAPL"}
-    assert set(df["account_type"]) == {"ROTH IRA", "INDIVIDUAL"}
+    assert set(df["account"]) == {"Roth IRA", "Individual"}
+
+
+def test_unrealized_pl_pct_is_relative_to_cost_basis():
+    df = positions_dataframe(ACCOUNTS)
+    vti_roth = df[(df["symbol"] == "VTI") & (df["account"] == "Roth IRA")].iloc[0]
+    # cost basis = 2200 - 200 = 2000 → +200 is +10%, not 200/2200=9.09%
+    assert round(vti_roth["unrealized_pl_pct"], 2) == 10.0
 
 
 def test_total_unrealized_pl_sums_across_accounts():
