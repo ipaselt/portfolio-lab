@@ -3,7 +3,12 @@
 This validates the aggregation math against the ASSUMED Schwab response shape — it does not
 validate that Schwab's real API actually returns this shape (see schwab_client.py docstring).
 """
-from src.portfolio import allocation_by_symbol, positions_dataframe, total_unrealized_pl
+from src.portfolio import (
+    account_performance,
+    allocation_by_symbol,
+    positions_dataframe,
+    total_unrealized_pl,
+)
 
 ACCOUNTS = [
     {
@@ -65,6 +70,23 @@ def test_total_unrealized_pl_sums_across_accounts():
     total_pl, total_value, pct = total_unrealized_pl(df)
     assert total_pl == 230.0
     assert total_value == 3600.0
+
+
+def test_account_performance_rollup():
+    df = positions_dataframe(ACCOUNTS)
+    perf = account_performance(df)
+    assert len(perf) == 2
+    roth = perf[perf["account"] == "Roth IRA"].iloc[0]
+    assert roth["market_value"] == 2200.0
+    assert roth["cost_basis"] == 2000.0
+    assert round(roth["unrealized_pl_pct"], 2) == 10.0
+    # % of portfolio sums to 100
+    assert round(perf["pct_of_portfolio"].sum(), 6) == 100.0
+
+
+def test_pct_of_portfolio_column_sums_to_100():
+    df = positions_dataframe(ACCOUNTS)
+    assert round(df["pct_of_portfolio"].sum(), 6) == 100.0
 
 
 def test_allocation_by_symbol_groups_across_accounts():

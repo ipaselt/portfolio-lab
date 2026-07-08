@@ -14,7 +14,13 @@ sys.path.insert(0, str(PROJECT_ROOT))
 import streamlit as st
 
 from src.schwab_client import ReauthNeeded, get_accounts_summary, get_client
-from src.portfolio import allocation_by_symbol, positions_dataframe, total_unrealized_pl
+from src.portfolio import (
+    account_performance,
+    allocation_by_symbol,
+    pl_by_account_chart,
+    positions_dataframe,
+    total_unrealized_pl,
+)
 
 st.set_page_config(page_title="Portfolio Lab", layout="wide")
 st.title("Portfolio Lab")
@@ -45,8 +51,25 @@ else:
     col2.metric("Unrealized P&L", f"${total_pl:,.2f}")
     col3.metric("Unrealized P&L %", f"{pct:.2f}%")
 
+    st.subheader("Performance by account")
+    perf = account_performance(df)
+    st.dataframe(
+        perf.style.format({
+            "market_value": "${:,.2f}", "cost_basis": "${:,.2f}",
+            "unrealized_pl": "${:,.2f}", "unrealized_pl_pct": "{:.1f}%",
+            "pct_of_portfolio": "{:.1f}%",
+        }),
+        use_container_width=True, hide_index=True)
+    st.plotly_chart(pl_by_account_chart(df), use_container_width=True)
+
     st.subheader("Positions")
-    st.dataframe(df, use_container_width=True)
+    st.dataframe(
+        df.style.format({
+            "quantity": "{:,.2f}", "average_price": "${:,.2f}",
+            "market_value": "${:,.2f}", "unrealized_pl": "${:,.2f}",
+            "unrealized_pl_pct": "{:.1f}%", "pct_of_portfolio": "{:.1f}%",
+        }),
+        use_container_width=True, hide_index=True)
 
     st.subheader("Allocation by symbol")
     st.plotly_chart(allocation_by_symbol(df), use_container_width=True)
