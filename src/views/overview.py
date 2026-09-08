@@ -18,7 +18,8 @@ from src.ui import page_header, signed_pct, signed_usd
 try:
     client = get_client()
     accounts = get_accounts_summary(client)
-except ReauthNeeded as e:
+except (ReauthNeeded, OAuthError) as e:
+    # ReauthNeeded = no usable token file; OAuthError = Schwab rejected the refresh token (expired/revoked).
     st.error(f"{e}\n\nRun `python -m src.authenticate` in a terminal, then reload this page.")
     st.stop()
 except KeyError:
