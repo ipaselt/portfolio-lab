@@ -47,3 +47,11 @@
 - ⏳ **#17** GitHub remote + review-before-push flow (money-math review gate), if/when user wants it.
 
 ✅ Completed → `../memory/completed-tasks.md`.
+
+## From the 2026-09-08 review of the OAuthError catch (b97cbcd) — pre-existing, not blockers
+- ⏳ **MAJOR** `src/views/charts.py:43`, `src/views/news.py:28`: `ReauthNeeded` subclasses `SystemExit`
+  (`src/schwab_client.py:20`), so `except Exception: return []` does not catch it — with no token file the
+  page hangs on "Running..." with no message. Fix: make `ReauthNeeded` subclass `Exception` (check
+  `src/authenticate.py` doesn't rely on exit semantics) or catch `(Exception, ReauthNeeded)` there.
+- ⏳ MINOR same two sites: `_holding_symbols` caches the `[]` from an `OAuthError` for 15 min
+  (`st.cache_data(ttl=900)`), so Charts/News stay empty after re-auth. Don't cache the failure path.
