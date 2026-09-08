@@ -10,6 +10,8 @@ from src.portfolio import (
     positions_dataframe,
     total_unrealized_pl,
 )
+from authlib.integrations.base_client.errors import OAuthError
+
 from src.schwab_client import ReauthNeeded, get_accounts_summary, get_client
 from src.ui import page_header, signed_pct, signed_usd
 
